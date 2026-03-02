@@ -1,13 +1,17 @@
 import requests
 import logging
+import os
+from dotenv import load_dotenv  # ← add this
+
+load_dotenv()  # ← add this, loads .env file
 
 class TelegramNotifier:
     def __init__(self, bot_token=None, chat_id=None):
         # REPLACE THESE WITH YOUR ACTUAL BOT TOKEN AND CHAT ID
         # You can get a Bot Token from BotFather on Telegram
         # You can get your Chat ID by messaging your bot and looking at https://api.telegram.org/bot<TOKEN>/getUpdates
-        self.bot_token = bot_token or "YOUR_BOT_TOKEN_HERE"
-        self.chat_id = chat_id or "YOUR_CHAT_ID_HERE"
+        self.bot_token = bot_token or os.getenv("TELEGRAM_BOT_TOKEN")  # ← change this
+        self.chat_id = chat_id or os.getenv("TELEGRAM_CHAT_ID")         # ← change this
         self.api_url = f"https://api.telegram.org/bot{self.bot_token}/sendMessage"
 
     def send_message(self, message):
