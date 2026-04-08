@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 
 # Excel data files
 *.xlsx
@@ -11,6 +12,10 @@ portfolio_config.json
 
 # Environment secrets
 .env
+
+# Local runtime files
+bot.pid
+output.log
 
 venv/
 .venv/
