@@ -1,11 +1,10 @@
-import time
-import schedule
-import logging
 import datetime
 import random
+import time
+import logging
+
 from excel_manager import ExcelManager
-from event_bus import bus
-from main import on_new_trades_notification
+from telegram_notifier import telegram_bot
 
 # Setup simple logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
@@ -63,30 +62,27 @@ def fetch_fake_job(excel_mgr):
     # Shuffle so the static trade isn't always at the end
     random.shuffle(mock_trades)
     
-    # Publish to the event bus just like the real API would
-    bus.publish("on_raw_trades_fetched", mock_trades)
+    new_records = excel_mgr.process_new_trades(mock_trades)
+    if new_records:
+        telegram_bot.format_and_send_trades(
+            new_records,
+            {"portfolio_id": "TEST_PORTFOLIO", "label": "Test Portfolio"},
+        )
 
 def start_test():
     # Write to a separate test file so we don't pollute your real data
-    excel_mgr = ExcelManager(filename="test_binance_trades.xlsx")
-    
-    # Subscribe systems to events
-    bus.subscribe("on_raw_trades_fetched", excel_mgr.process_new_trades)
-    bus.subscribe("on_new_trades_saved", on_new_trades_notification)
-    
-    # Run once immediately
-    fetch_fake_job(excel_mgr)
-    
-    # In test mode, we'll run it every 10 seconds instead of 1 minute!
-    schedule.every(10).seconds.do(fetch_fake_job, excel_mgr)
-    
-    logging.info("Test scheduler started. Generating fake trades every 10 seconds. Press Ctrl+C to exit.")
+    excel_mgr = ExcelManager(
+        filename="test_binance_trades.xlsx",
+        portfolio_id="TEST_PORTFOLIO",
+        portfolio_label="Test Portfolio",
+    )
+
+    logging.info("Test loop started. Generating fake trades every 10 seconds. Press Ctrl+C to exit.")
     
     try:
         while True:
-            schedule.run_pending()
-            time.sleep(1)
-            
+            fetch_fake_job(excel_mgr)
+            time.sleep(10)
     except KeyboardInterrupt:
         logging.info("Exiting test application...")
 

@@ -6,8 +6,11 @@ __pycache__/
 # Excel data files
 *.xlsx
 *.csv
+exports/
+portfolio_config.json
 
 # Environment secrets
 .env
 
 venv/
+.venv/
