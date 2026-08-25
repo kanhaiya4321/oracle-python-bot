@@ -182,3 +182,4 @@ Current shape:
 - Add logging to a file
 - Add retry/backoff around Binance failures
 - Add tests for config store and Excel deduplication
+# number_sepration
